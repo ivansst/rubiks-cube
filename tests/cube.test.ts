@@ -1,5 +1,5 @@
-import { RubiksCube } from './cube'
-import { Color } from './colors'
+import { RubiksCube } from '../src/cube'
+import { Color } from '../src/colors'
 
 describe('RubiksCube', () => {
   let cube: RubiksCube
