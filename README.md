@@ -1,77 +1,51 @@
-# Simple Rubik's Cube Simulator
+# Rubik's Cube CLI
 
-A clear and explainable Rubik's Cube simulator for the terminal, built with TypeScript. This project demonstrates the core logic of cube rotations in an understandable way.
+A terminal-based Rubik's cube simulator. Perfect for practicing algorithms or just messing around with cube rotations when you're stuck in the terminal.
 
-## Features
+## What's this?
 
-- Represents the state of a 3x3 Rubik’s Cube.
-- Initializes to a standard solved state:
+It's a 3x3 Rubik's cube that you can play with in your terminal. The cube starts solved with:
 
-  - **White on top (Up)**
-  - **Green on the front (Front)**
-  - **Red on the right (Right)**
-  - **Orange on the left (Left)**
-  - **Blue on the back (Back)**
-  - **Yellow on the bottom (Down)**
+- White up
+- Green front
+- Red right
+- Orange left
+- Blue back
+- Yellow down
 
-- Supports all **12 basic face rotations** used in standard cube notation:
+## Controls
 
-  - **F / F'** — Front face
+Basic moves (standard cube notation):
 
-    - `F` rotates the front face **clockwise**
-    - `F'` rotates the front face **counter clockwise**
+```
+F/F' - Front face turns
+R/R' - Right face turns
+U/U' - Top (Up) face turns
+B/B' - Back face turns
+L/L' - Left face turns
+D/D' - Bottom (Down) face turns
+```
 
-  - **R / R'** — Right face
+(Add ' for counter-clockwise. Example: F' turns front face counter-clockwise)
 
-    - `R` rotates the right face **clockwise**
-    - `R'` rotates the right face **counter clockwise**
+The cube state is shown using letters for colors:
 
-  - **U / U'** — Up (top) face
+```
+W = White   R = Red     B = Blue
+G = Green   O = Orange  Y = Yellow
+```
 
-    - `U` rotates the top face **clockwise**
-    - `U'` rotates the top face **counter clockwise**
+## Quick Start
 
-  - **B / B'** — Back face
+1. Make sure you have Node.js installed (v16+ recommended)
+2. Clone this repo
+3. `npm install`
+4. `npm run dev` to start playing
 
-    - `B` rotates the back face **clockwise**
-    - `B'` rotates the back face **counter clockwise**
+## Dev Notes
 
-  - **L / L'** — Left face
+- Built with TypeScript because I like catching errors before they happen
+- Uses `inquirer` for the menu because nobody likes raw readline
+- Run `npm test` if you want to make sure I didn't break anything
 
-    - `L` rotates the left face **clockwise**
-    - `L'` rotates the left face **counter clockwise**
-
-  - **D / D'** — Down (bottom) face
-    - `D` rotates the bottom face **clockwise**
-    - `D'` rotates the bottom face **counter clockwise**
-
-- Includes an **interactive terminal menu** to perform moves step-by-step.
-- Displays the current cube state in an **exploded view** using single-letter color codes:
-  - `W` = White
-  - `G` = Green
-  - `R` = Red
-  - `B` = Blue
-  - `O` = Orange
-  - `Y` = Yellow
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) (includes npm) - Version 16 or later recommended.
-- A terminal or command prompt.
-
-## Setup
-
-1.  Clone or download the project.
-2.  Navigate to the project directory in your terminal.
-3.  Run `npm install` to install dependencies.
-
-## Building
-
-Run `npm run build` to compile TypeScript to JavaScript (output to `dist/`).
-
-## Running
-
-- **Development:** `npm run dev` (uses ts-node to run TypeScript directly)
-- **Production:** `npm start` (runs the compiled JavaScript from `dist/`)
-
-_(Current state only displays the initial solved cube)_
+Pro tip: The cube state is shown in an "unwrapped" view - imagine peeling the stickers off and laying them flat. Takes a bit to get used to, but it's the best way I found to show it in the terminal.

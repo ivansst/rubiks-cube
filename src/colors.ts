@@ -1,16 +1,21 @@
 /**
- * Represents the possible colors on a Rubik's Cube face using single letters.
+ * The classic Rubik's cube colors! 🎨
  */
 export enum Color {
   White = 'W',
-  Yellow = 'Y',
-  Green = 'G',
-  Blue = 'B',
-  Red = 'R',
   Orange = 'O',
+  Green = 'G',
+  Red = 'R',
+  Blue = 'B',
+  Yellow = 'Y',
 }
 
 /**
- * Represents a 3x3 face of the cube as a 2D array of colors.
+ * A face is a 3x3 grid of colors
  */
 export type Face = Color[][]
+
+// Helper to check if something is a valid color
+export function isValidColor(color: string): color is Color {
+  return Object.values(Color).includes(color as Color)
+}

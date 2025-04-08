@@ -2,33 +2,37 @@ import { Color, Face } from './colors'
 import createFace from './helpers'
 
 export class RubiksCube {
+  // Each face is a 3x3 grid of colors
   faces: {
-    topFace: Face
-    leftFace: Face
-    frontFace: Face
-    rightFace: Face
-    backFace: Face
-    bottomFace: Face
-  } = RubiksCube.createSolvedFaces()
+    up: Face // White by default
+    left: Face // Orange
+    front: Face // Green
+    right: Face // Red
+    back: Face // Blue
+    down: Face // Yellow
+  } = RubiksCube.createSolvedCube()
 
   constructor() {}
 
-  static createSolvedFaces() {
+  // Creates a fresh solved cube - all faces have their default colors
+  static createSolvedCube() {
     return {
-      topFace: createFace(Color.White),
-      leftFace: createFace(Color.Orange),
-      frontFace: createFace(Color.Green),
-      rightFace: createFace(Color.Red),
-      backFace: createFace(Color.Blue),
-      bottomFace: createFace(Color.Yellow),
+      up: createFace(Color.White),
+      left: createFace(Color.Orange),
+      front: createFace(Color.Green),
+      right: createFace(Color.Red),
+      back: createFace(Color.Blue),
+      down: createFace(Color.Yellow),
     }
   }
 
+  // Back to square one
   reset(): void {
-    this.faces = RubiksCube.createSolvedFaces()
+    this.faces = RubiksCube.createSolvedCube()
   }
 
-  private rotateClockwise(faceKey: keyof RubiksCube['faces']): void {
+  // The magic that makes a face spin clockwise
+  private spin(faceKey: keyof RubiksCube['faces']): void {
     const face = this.faces[faceKey]
     const N = 3
     for (let i = 0; i < N / 2; i++) {
@@ -42,306 +46,299 @@ export class RubiksCube {
     }
   }
 
-  private rotateCounterClockwise(faceKey: keyof RubiksCube['faces']): void {
-    const face = this.faces[faceKey]
-    const N = 3
-    for (let i = 0; i < N / 2; i++) {
-      for (let j = i; j < N - i - 1; j++) {
-        let temp = face[i][j]
-        face[i][j] = face[j][N - 1 - i]
-        face[j][N - 1 - i] = face[N - 1 - i][N - 1 - j]
-        face[N - 1 - i][N - 1 - j] = face[N - 1 - j][i]
-        face[N - 1 - j][i] = temp
-      }
-    }
+  // Same as spin but the other way around
+  private spinBack(faceKey: keyof RubiksCube['faces']): void {
+    // Do it three times clockwise - same as once counter-clockwise
+    // (yeah, it's lazy but it works)
+    this.spin(faceKey)
+    this.spin(faceKey)
+    this.spin(faceKey)
   }
 
-  frontFaceClockwise(): void {
-    this.rotateClockwise('frontFace')
+  // Front face moves
+  turnFront(): void {
+    this.spin('front')
     const temp: Color[] = [
-      this.faces.topFace[2][0],
-      this.faces.topFace[2][1],
-      this.faces.topFace[2][2],
+      this.faces.up[2][0],
+      this.faces.up[2][1],
+      this.faces.up[2][2],
     ]
-    this.faces.topFace[2][0] = this.faces.leftFace[2][2]
-    this.faces.topFace[2][1] = this.faces.leftFace[1][2]
-    this.faces.topFace[2][2] = this.faces.leftFace[0][2]
+    this.faces.up[2][0] = this.faces.left[2][2]
+    this.faces.up[2][1] = this.faces.left[1][2]
+    this.faces.up[2][2] = this.faces.left[0][2]
 
-    this.faces.leftFace[0][2] = this.faces.bottomFace[0][0]
-    this.faces.leftFace[1][2] = this.faces.bottomFace[0][1]
-    this.faces.leftFace[2][2] = this.faces.bottomFace[0][2]
+    this.faces.left[0][2] = this.faces.down[0][0]
+    this.faces.left[1][2] = this.faces.down[0][1]
+    this.faces.left[2][2] = this.faces.down[0][2]
 
-    this.faces.bottomFace[0][0] = this.faces.rightFace[2][0]
-    this.faces.bottomFace[0][1] = this.faces.rightFace[1][0]
-    this.faces.bottomFace[0][2] = this.faces.rightFace[0][0]
+    this.faces.down[0][0] = this.faces.right[2][0]
+    this.faces.down[0][1] = this.faces.right[1][0]
+    this.faces.down[0][2] = this.faces.right[0][0]
 
-    this.faces.rightFace[0][0] = temp[0]
-    this.faces.rightFace[1][0] = temp[1]
-    this.faces.rightFace[2][0] = temp[2]
+    this.faces.right[0][0] = temp[0]
+    this.faces.right[1][0] = temp[1]
+    this.faces.right[2][0] = temp[2]
   }
 
-  frontFaceCounterClockwise(): void {
-    this.rotateCounterClockwise('frontFace')
+  turnFrontReverse(): void {
+    this.spinBack('front')
     const temp: Color[] = [
-      this.faces.topFace[2][0],
-      this.faces.topFace[2][1],
-      this.faces.topFace[2][2],
+      this.faces.up[2][0],
+      this.faces.up[2][1],
+      this.faces.up[2][2],
     ]
-    this.faces.topFace[2][0] = this.faces.rightFace[0][0]
-    this.faces.topFace[2][1] = this.faces.rightFace[1][0]
-    this.faces.topFace[2][2] = this.faces.rightFace[2][0]
+    this.faces.up[2][0] = this.faces.right[0][0]
+    this.faces.up[2][1] = this.faces.right[1][0]
+    this.faces.up[2][2] = this.faces.right[2][0]
 
-    this.faces.rightFace[0][0] = this.faces.bottomFace[0][2]
-    this.faces.rightFace[1][0] = this.faces.bottomFace[0][1]
-    this.faces.rightFace[2][0] = this.faces.bottomFace[0][0]
+    this.faces.right[0][0] = this.faces.down[0][2]
+    this.faces.right[1][0] = this.faces.down[0][1]
+    this.faces.right[2][0] = this.faces.down[0][0]
 
-    this.faces.bottomFace[0][0] = this.faces.leftFace[0][2]
-    this.faces.bottomFace[0][1] = this.faces.leftFace[1][2]
-    this.faces.bottomFace[0][2] = this.faces.leftFace[2][2]
+    this.faces.down[0][0] = this.faces.left[0][2]
+    this.faces.down[0][1] = this.faces.left[1][2]
+    this.faces.down[0][2] = this.faces.left[2][2]
 
-    this.faces.leftFace[0][2] = temp[2]
-    this.faces.leftFace[1][2] = temp[1]
-    this.faces.leftFace[2][2] = temp[0]
+    this.faces.left[0][2] = temp[2]
+    this.faces.left[1][2] = temp[1]
+    this.faces.left[2][2] = temp[0]
   }
 
-  rightFaceClockwise(): void {
-    this.rotateClockwise('rightFace')
+  // Right face moves
+  turnRight(): void {
+    this.spin('right')
     const temp: Color[] = [
-      this.faces.topFace[0][2],
-      this.faces.topFace[1][2],
-      this.faces.topFace[2][2],
+      this.faces.up[0][2],
+      this.faces.up[1][2],
+      this.faces.up[2][2],
     ]
-    this.faces.topFace[0][2] = this.faces.frontFace[0][2]
-    this.faces.topFace[1][2] = this.faces.frontFace[1][2]
-    this.faces.topFace[2][2] = this.faces.frontFace[2][2]
+    this.faces.up[0][2] = this.faces.front[0][2]
+    this.faces.up[1][2] = this.faces.front[1][2]
+    this.faces.up[2][2] = this.faces.front[2][2]
 
-    this.faces.frontFace[0][2] = this.faces.bottomFace[0][2]
-    this.faces.frontFace[1][2] = this.faces.bottomFace[1][2]
-    this.faces.frontFace[2][2] = this.faces.bottomFace[2][2]
+    this.faces.front[0][2] = this.faces.down[0][2]
+    this.faces.front[1][2] = this.faces.down[1][2]
+    this.faces.front[2][2] = this.faces.down[2][2]
 
-    this.faces.bottomFace[0][2] = this.faces.backFace[2][0]
-    this.faces.bottomFace[1][2] = this.faces.backFace[1][0]
-    this.faces.bottomFace[2][2] = this.faces.backFace[0][0]
+    this.faces.down[0][2] = this.faces.back[2][0]
+    this.faces.down[1][2] = this.faces.back[1][0]
+    this.faces.down[2][2] = this.faces.back[0][0]
 
-    this.faces.backFace[0][0] = temp[2]
-    this.faces.backFace[1][0] = temp[1]
-    this.faces.backFace[2][0] = temp[0]
+    this.faces.back[0][0] = temp[2]
+    this.faces.back[1][0] = temp[1]
+    this.faces.back[2][0] = temp[0]
   }
 
-  rightFaceCounterClockwise(): void {
-    this.rotateCounterClockwise('rightFace')
+  turnRightReverse(): void {
+    this.spinBack('right')
     const temp: Color[] = [
-      this.faces.topFace[0][2],
-      this.faces.topFace[1][2],
-      this.faces.topFace[2][2],
+      this.faces.up[0][2],
+      this.faces.up[1][2],
+      this.faces.up[2][2],
     ]
-    this.faces.topFace[0][2] = this.faces.backFace[2][0]
-    this.faces.topFace[1][2] = this.faces.backFace[1][0]
-    this.faces.topFace[2][2] = this.faces.backFace[0][0]
+    this.faces.up[0][2] = this.faces.back[2][0]
+    this.faces.up[1][2] = this.faces.back[1][0]
+    this.faces.up[2][2] = this.faces.back[0][0]
 
-    this.faces.backFace[0][0] = this.faces.bottomFace[2][2]
-    this.faces.backFace[1][0] = this.faces.bottomFace[1][2]
-    this.faces.backFace[2][0] = this.faces.bottomFace[0][2]
+    this.faces.back[0][0] = this.faces.down[2][2]
+    this.faces.back[1][0] = this.faces.down[1][2]
+    this.faces.back[2][0] = this.faces.down[0][2]
 
-    this.faces.bottomFace[0][2] = this.faces.frontFace[0][2]
-    this.faces.bottomFace[1][2] = this.faces.frontFace[1][2]
-    this.faces.bottomFace[2][2] = this.faces.frontFace[2][2]
+    this.faces.down[0][2] = this.faces.front[0][2]
+    this.faces.down[1][2] = this.faces.front[1][2]
+    this.faces.down[2][2] = this.faces.front[2][2]
 
-    this.faces.frontFace[0][2] = temp[0]
-    this.faces.frontFace[1][2] = temp[1]
-    this.faces.frontFace[2][2] = temp[2]
+    this.faces.front[0][2] = temp[0]
+    this.faces.front[1][2] = temp[1]
+    this.faces.front[2][2] = temp[2]
   }
 
-  topFaceClockwise(): void {
-    this.rotateClockwise('topFace')
-    const temp: Color[] = this.faces.frontFace[0].slice()
-    this.faces.frontFace[0] = this.faces.rightFace[0].slice()
-    this.faces.rightFace[0] = this.faces.backFace[0].slice()
-    this.faces.backFace[0] = this.faces.leftFace[0].slice()
-    this.faces.leftFace[0] = temp
+  // Top face moves
+  spinUp(): void {
+    this.spin('up')
+    // For top spins we can just rotate entire rows - much simpler!
+    const temp = this.faces.front[0].slice()
+    this.faces.front[0] = this.faces.right[0].slice()
+    this.faces.right[0] = this.faces.back[0].slice()
+    this.faces.back[0] = this.faces.left[0].slice()
+    this.faces.left[0] = temp
   }
 
-  topFaceCounterClockwise(): void {
-    this.rotateCounterClockwise('topFace')
-    const temp: Color[] = this.faces.frontFace[0].slice()
-    this.faces.frontFace[0] = this.faces.leftFace[0].slice()
-    this.faces.leftFace[0] = this.faces.backFace[0].slice()
-    this.faces.backFace[0] = this.faces.rightFace[0].slice()
-    this.faces.rightFace[0] = temp
+  spinUpReverse(): void {
+    this.spinBack('up')
+    const temp = this.faces.front[0].slice()
+    this.faces.front[0] = this.faces.left[0].slice()
+    this.faces.left[0] = this.faces.back[0].slice()
+    this.faces.back[0] = this.faces.right[0].slice()
+    this.faces.right[0] = temp
   }
 
-  backFaceClockwise(): void {
-    this.rotateClockwise('backFace')
-    const temp: Color[] = this.faces.topFace[0].slice()
+  // Back face moves
+  turnBack(): void {
+    this.spin('back')
+    const temp = this.faces.up[0].slice()
 
-    this.faces.topFace[0][0] = this.faces.rightFace[0][2]
-    this.faces.topFace[0][1] = this.faces.rightFace[1][2]
-    this.faces.topFace[0][2] = this.faces.rightFace[2][2]
+    this.faces.up[0][0] = this.faces.right[0][2]
+    this.faces.up[0][1] = this.faces.right[1][2]
+    this.faces.up[0][2] = this.faces.right[2][2]
 
-    this.faces.rightFace[0][2] = this.faces.bottomFace[2][2]
-    this.faces.rightFace[1][2] = this.faces.bottomFace[2][1]
-    this.faces.rightFace[2][2] = this.faces.bottomFace[2][0]
+    this.faces.right[0][2] = this.faces.down[2][2]
+    this.faces.right[1][2] = this.faces.down[2][1]
+    this.faces.right[2][2] = this.faces.down[2][0]
 
-    this.faces.bottomFace[2][0] = this.faces.leftFace[2][0]
-    this.faces.bottomFace[2][1] = this.faces.leftFace[1][0]
-    this.faces.bottomFace[2][2] = this.faces.leftFace[0][0]
+    this.faces.down[2][0] = this.faces.left[2][0]
+    this.faces.down[2][1] = this.faces.left[1][0]
+    this.faces.down[2][2] = this.faces.left[0][0]
 
-    this.faces.leftFace[0][0] = temp[2]
-    this.faces.leftFace[1][0] = temp[1]
-    this.faces.leftFace[2][0] = temp[0]
+    this.faces.left[0][0] = temp[2]
+    this.faces.left[1][0] = temp[1]
+    this.faces.left[2][0] = temp[0]
   }
 
-  backFaceCounterClockwise(): void {
-    this.rotateCounterClockwise('backFace')
-    const temp: Color[] = this.faces.topFace[0].slice()
+  turnBackReverse(): void {
+    this.spinBack('back')
+    const temp = this.faces.up[0].slice()
 
-    this.faces.topFace[0][0] = this.faces.leftFace[2][0]
-    this.faces.topFace[0][1] = this.faces.leftFace[1][0]
-    this.faces.topFace[0][2] = this.faces.leftFace[0][0]
+    this.faces.up[0][0] = this.faces.left[2][0]
+    this.faces.up[0][1] = this.faces.left[1][0]
+    this.faces.up[0][2] = this.faces.left[0][0]
 
-    this.faces.leftFace[0][0] = this.faces.bottomFace[2][0]
-    this.faces.leftFace[1][0] = this.faces.bottomFace[2][1]
-    this.faces.leftFace[2][0] = this.faces.bottomFace[2][2]
+    this.faces.left[0][0] = this.faces.down[2][0]
+    this.faces.left[1][0] = this.faces.down[2][1]
+    this.faces.left[2][0] = this.faces.down[2][2]
 
-    this.faces.bottomFace[2][0] = this.faces.rightFace[2][2]
-    this.faces.bottomFace[2][1] = this.faces.rightFace[1][2]
-    this.faces.bottomFace[2][2] = this.faces.rightFace[0][2]
+    this.faces.down[2][0] = this.faces.right[2][2]
+    this.faces.down[2][1] = this.faces.right[1][2]
+    this.faces.down[2][2] = this.faces.right[0][2]
 
-    this.faces.rightFace[0][2] = temp[0]
-    this.faces.rightFace[1][2] = temp[1]
-    this.faces.rightFace[2][2] = temp[2]
+    this.faces.right[0][2] = temp[0]
+    this.faces.right[1][2] = temp[1]
+    this.faces.right[2][2] = temp[2]
   }
 
-  leftFaceClockwise(): void {
-    this.rotateClockwise('leftFace')
+  // Left face moves
+  turnLeft(): void {
+    this.spin('left')
     const temp: Color[] = [
-      this.faces.topFace[0][0],
-      this.faces.topFace[1][0],
-      this.faces.topFace[2][0],
+      this.faces.up[0][0],
+      this.faces.up[1][0],
+      this.faces.up[2][0],
     ]
-    this.faces.topFace[0][0] = this.faces.backFace[2][2]
-    this.faces.topFace[1][0] = this.faces.backFace[1][2]
-    this.faces.topFace[2][0] = this.faces.backFace[0][2]
+    this.faces.up[0][0] = this.faces.back[2][2]
+    this.faces.up[1][0] = this.faces.back[1][2]
+    this.faces.up[2][0] = this.faces.back[0][2]
 
-    this.faces.backFace[0][2] = this.faces.bottomFace[2][0]
-    this.faces.backFace[1][2] = this.faces.bottomFace[1][0]
-    this.faces.backFace[2][2] = this.faces.bottomFace[0][0]
+    this.faces.back[0][2] = this.faces.down[2][0]
+    this.faces.back[1][2] = this.faces.down[1][0]
+    this.faces.back[2][2] = this.faces.down[0][0]
 
-    this.faces.bottomFace[0][0] = this.faces.frontFace[0][0]
-    this.faces.bottomFace[1][0] = this.faces.frontFace[1][0]
-    this.faces.bottomFace[2][0] = this.faces.frontFace[2][0]
+    this.faces.down[0][0] = this.faces.front[0][0]
+    this.faces.down[1][0] = this.faces.front[1][0]
+    this.faces.down[2][0] = this.faces.front[2][0]
 
-    this.faces.frontFace[0][0] = temp[0]
-    this.faces.frontFace[1][0] = temp[1]
-    this.faces.frontFace[2][0] = temp[2]
+    this.faces.front[0][0] = temp[0]
+    this.faces.front[1][0] = temp[1]
+    this.faces.front[2][0] = temp[2]
   }
 
-  leftFaceCounterClockwise(): void {
-    this.rotateCounterClockwise('leftFace')
+  turnLeftReverse(): void {
+    this.spinBack('left')
     const temp: Color[] = [
-      this.faces.topFace[0][0],
-      this.faces.topFace[1][0],
-      this.faces.topFace[2][0],
+      this.faces.up[0][0],
+      this.faces.up[1][0],
+      this.faces.up[2][0],
     ]
-    this.faces.topFace[0][0] = this.faces.frontFace[0][0]
-    this.faces.topFace[1][0] = this.faces.frontFace[1][0]
-    this.faces.topFace[2][0] = this.faces.frontFace[2][0]
+    this.faces.up[0][0] = this.faces.front[0][0]
+    this.faces.up[1][0] = this.faces.front[1][0]
+    this.faces.up[2][0] = this.faces.front[2][0]
 
-    this.faces.frontFace[0][0] = this.faces.bottomFace[0][0]
-    this.faces.frontFace[1][0] = this.faces.bottomFace[1][0]
-    this.faces.frontFace[2][0] = this.faces.bottomFace[2][0]
+    this.faces.front[0][0] = this.faces.down[0][0]
+    this.faces.front[1][0] = this.faces.down[1][0]
+    this.faces.front[2][0] = this.faces.down[2][0]
 
-    this.faces.bottomFace[0][0] = this.faces.backFace[2][2]
-    this.faces.bottomFace[1][0] = this.faces.backFace[1][2]
-    this.faces.bottomFace[2][0] = this.faces.backFace[0][2]
+    this.faces.down[0][0] = this.faces.back[2][2]
+    this.faces.down[1][0] = this.faces.back[1][2]
+    this.faces.down[2][0] = this.faces.back[0][2]
 
-    this.faces.backFace[0][2] = temp[2]
-    this.faces.backFace[1][2] = temp[1]
-    this.faces.backFace[2][2] = temp[0]
+    this.faces.back[0][2] = temp[2]
+    this.faces.back[1][2] = temp[1]
+    this.faces.back[2][2] = temp[0]
   }
 
-  bottomFaceClockwise(): void {
-    this.rotateClockwise('bottomFace')
-    const temp: Color[] = this.faces.frontFace[2].slice()
-    this.faces.frontFace[2] = this.faces.leftFace[2].slice()
-    this.faces.leftFace[2] = this.faces.backFace[2].slice()
-    this.faces.backFace[2] = this.faces.rightFace[2].slice()
-    this.faces.rightFace[2] = temp
+  // Bottom face moves
+  spinDown(): void {
+    this.spin('down')
+    const temp = this.faces.front[2].slice()
+    this.faces.front[2] = this.faces.left[2].slice()
+    this.faces.left[2] = this.faces.back[2].slice()
+    this.faces.back[2] = this.faces.right[2].slice()
+    this.faces.right[2] = temp
   }
 
-  bottomFaceCounterClockwise(): void {
-    this.rotateCounterClockwise('bottomFace')
-    const temp: Color[] = this.faces.frontFace[2].slice()
-    this.faces.frontFace[2] = this.faces.rightFace[2].slice()
-    this.faces.rightFace[2] = this.faces.backFace[2].slice()
-    this.faces.backFace[2] = this.faces.leftFace[2].slice()
-    this.faces.leftFace[2] = temp
+  spinDownReverse(): void {
+    this.spinBack('down')
+    const temp = this.faces.front[2].slice()
+    this.faces.front[2] = this.faces.right[2].slice()
+    this.faces.right[2] = this.faces.back[2].slice()
+    this.faces.back[2] = this.faces.left[2].slice()
+    this.faces.left[2] = temp
   }
 
+  // Maps old notation to new method names
   applyMoves(move: string): void {
-    switch (move) {
-      case 'F':
-        this.frontFaceClockwise()
-        break
-      case "F'":
-        this.frontFaceCounterClockwise()
-        break
-      case 'R':
-        this.rightFaceClockwise()
-        break
-      case "R'":
-        this.rightFaceCounterClockwise()
-        break
-      case 'U':
-        this.topFaceClockwise()
-        break
-      case "U'":
-        this.topFaceCounterClockwise()
-        break
-      case 'B':
-        this.backFaceClockwise()
-        break
-      case "B'":
-        this.backFaceCounterClockwise()
-        break
-      case 'L':
-        this.leftFaceClockwise()
-        break
-      case "L'":
-        this.leftFaceCounterClockwise()
-        break
-      case 'D':
-        this.bottomFaceClockwise()
-        break
-      case "D'":
-        this.bottomFaceCounterClockwise()
-        break
-      default:
-        console.warn(`Attempted to apply unknown move: ${move}`)
+    const moveMap = {
+      F: () => this.turnFront(),
+      "F'": () => this.turnFrontReverse(),
+      R: () => this.turnRight(),
+      "R'": () => this.turnRightReverse(),
+      U: () => this.spinUp(),
+      "U'": () => this.spinUpReverse(),
+      B: () => this.turnBack(),
+      "B'": () => this.turnBackReverse(),
+      L: () => this.turnLeft(),
+      "L'": () => this.turnLeftReverse(),
+      D: () => this.spinDown(),
+      "D'": () => this.spinDownReverse(),
+    }
+
+    const fn = moveMap[move as keyof typeof moveMap]
+    if (fn) {
+      fn()
+    } else {
+      console.warn(`Huh? Don't know how to do move: ${move}`)
     }
   }
 
+  // Shows the current state of the cube in the terminal
   printState(): void {
     const pad = '       '
-    console.log('\n--- Cube State ---')
-    if (!this.faces || !this.faces.topFace) {
-      console.error('Error: Cube state not initialized.')
+    console.log('\n--- Current Cube State ---')
+    if (!this.faces || !this.faces.up) {
+      console.error('Oops - cube not initialized properly!')
       return
     }
+
+    // Print top face
     for (let i = 0; i < 3; i++) {
-      console.log(`${pad}${this.faces.topFace[i].join(' ')}`)
+      console.log(`${pad}${this.faces.up[i].join(' ')}`)
     }
     console.log('')
+
+    // Print middle strip (left, front, right, back)
     for (let i = 0; i < 3; i++) {
-      const lRow = this.faces.leftFace[i].join(' ')
-      const fRow = this.faces.frontFace[i].join(' ')
-      const rRow = this.faces.rightFace[i].join(' ')
-      const bRow = this.faces.backFace[i].join(' ')
-      console.log(`${lRow}  ${fRow}  ${rRow}  ${bRow}`)
+      const row = [
+        this.faces.left[i].join(' '),
+        this.faces.front[i].join(' '),
+        this.faces.right[i].join(' '),
+        this.faces.back[i].join(' '),
+      ].join('  ')
+      console.log(row)
     }
     console.log('')
+
+    // Print bottom face
     for (let i = 0; i < 3; i++) {
-      console.log(`${pad}${this.faces.bottomFace[i].join(' ')}`)
+      console.log(`${pad}${this.faces.down[i].join(' ')}`)
     }
     console.log('------------------\n')
   }
